@@ -1,13 +1,19 @@
 {
 	"name": "kirbi-discord-musicplayer",
-	"version": "0.0.1",
 	"description": "add commands to play music in voice channels with Kirbi",
-	"author": "Nate Richardson <hello@naterichardson.com> (https://naterichardson.com)",
+	"version": "0.1.0",
+	"license": "Apache-2.0",
+	"readme": "README.md",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/Richardson-Media-House/kirbi-discord-musicplayer.git"
 	},
-	"license": "Apache-2.0",
+	"author": "Nate Richardson <hello@naterichardson.com> (https://naterichardson.com)",
+	"contributors": [
+		"Matt Carroll <admin@develogix.com> (https://develogix.com)",
+		"Joseph Moran III <joseph.moraniii@gmail.com> (https://josephmoran.co)"
+	],
+ 	"main": "musicplayer.js",
 	"dependencies": {
 		"ffmpeg-binaries": "^3.2.2",
 		"libsodium-wrappers": "^0.5.2",
@@ -17,5 +23,18 @@
 		"youtube-dl": "^1.11.1",
 		"kirbi-discord": "Richardson-Media-House/kirbi-discord"
  	},
- 	"main": "musicplayer.js"
+	"devDependencies": {
+		"xo": "^0.18.2"
+	},
+	"xo": {
+		"rules": {
+			"linebreak-style": ["error", "windows"],
+			"no-prototype-builtins": "warn",
+			"radix": "warn",
+			"guard-for-in": "warn"
+		}
+	},
+	"scripts": {
+		"test": "xo"
+	}
 }
