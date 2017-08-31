@@ -17,11 +17,7 @@
 	"dependencies": {
 		"ffmpeg-binaries": "^3.2.2",
 		"kirbi-discord": "Richardson-Media-House/kirbi-discord",
-		"libsodium-wrappers": "^0.5.2",
-		"node-opus": "0.2.6",
-		"opusscript": "0.0.3",
 		"request": "2.81.0",
-		"sodium": "^2.0.1",
 		"youtube-dl": "^1.11.1"
 	},
 	"devDependencies": {
