@@ -38,7 +38,9 @@
 				{
 					"arraysInObjects": false
 				}
-			]
+			],
+			"eqeqeq": "warn",
+			"no-eq-null": "warn"
 		}
 	},
 	"scripts": {
