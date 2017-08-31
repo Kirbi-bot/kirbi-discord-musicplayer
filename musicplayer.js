@@ -42,18 +42,18 @@ module.exports = function (Kirbi) {
 			// Join the voice channel if not already in one.
 			const voiceConnection = Kirbi.Discord.voiceConnections.get(msg.guild.id);
 
-			if (voiceConnection === null) {
+			if (voiceConnection == null) {
 				// Check if the user is in a voice channel.
 				const voiceChannel = getAuthorVoiceChannel(msg);
 
-				if (voiceChannel === null) {
-					// Otherwise, clear the queue and do nothing.
-					queue.splice(0, queue.length);
-					reject();
-				} else {
+				if (voiceChannel != null) {
 					voiceChannel.join().then(connection => {
 						resolve(connection);
 					}).catch(console.error);
+				} else {
+					// Otherwise, clear the queue and do nothing.
+					queue.splice(0, queue.length);
+					reject();
 				}
 			} else {
 				resolve(voiceConnection);
