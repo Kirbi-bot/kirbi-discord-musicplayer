@@ -13,22 +13,27 @@
 		"Matt Carroll <admin@develogix.com> (https://develogix.com)",
 		"Joseph Moran III <joseph.moraniii@gmail.com> (https://josephmoran.co)"
 	],
- 	"main": "musicplayer.js",
+	"main": "musicplayer.js",
 	"dependencies": {
 		"ffmpeg-binaries": "^3.2.2",
+		"kirbi-discord": "Richardson-Media-House/kirbi-discord",
 		"libsodium-wrappers": "^0.5.2",
-		"node-opus": "^0.2.6",
+		"node-opus": "0.2.6",
 		"opusscript": "0.0.3",
+		"request": "2.81.0",
 		"sodium": "^2.0.1",
-		"youtube-dl": "^1.11.1",
-		"kirbi-discord": "Richardson-Media-House/kirbi-discord"
- 	},
+		"youtube-dl": "^1.11.1"
+	},
 	"devDependencies": {
 		"xo": "^0.18.2"
 	},
 	"xo": {
 		"rules": {
-			"linebreak-style": ["error", "windows"],
+			"linebreak-style": [
+				"error",
+				"windows"
+			],
+			"no-negated-condition": "off",
 			"no-prototype-builtins": "warn",
 			"radix": "warn",
 			"guard-for-in": "warn"
