@@ -112,6 +112,7 @@ module.exports = function (Kirbi) {
 			'dequeue',
 			'pause',
 			'resume',
+			'stop',
 			'volume'
 		],
 		play: {
@@ -306,6 +307,20 @@ module.exports = function (Kirbi) {
 				if (voiceConnection.player.dispatcher) {
 					voiceConnection.player.dispatcher.resume();
 				}
+			}
+		},
+		stop: {
+			description: 'stops playback and removes everything from queue',
+			process: msg => {
+				const voiceConnection = Kirbi.Discord.voiceConnections.get(msg.guild.id);
+				const queue = getQueue(msg.guild.id);
+				// Clear Queue
+				queue.splice(0, queue.length);
+				// Resume and stop playing.
+				if (voiceConnection.player.dispatcher) {
+					voiceConnection.player.dispatcher.resume();
+				}
+				voiceConnection.player.dispatcher.end();
 			}
 		},
 		volume: {
