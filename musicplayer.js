@@ -24,7 +24,7 @@ module.exports = function (Kirbi) {
 	function executeQueue(msg, queue) {
 		// If the queue is empty, finish.
 		if (queue.length === 0) {
-			msg.channel.send(wrap('Playback finished.'));
+			msg.channel.send(createEmbed('Playback finished.'));
 
 			// Leave the voice channel.
 			const voiceConnection = Kirbi.Discord.voiceConnections.get(msg.guild.id);
@@ -63,7 +63,7 @@ module.exports = function (Kirbi) {
 			const video = queue[0];
 
 			// Play the video.
-			msg.channel.send(wrap('Now Playing: ' + video.title)).then(() => {
+			msg.channel.send(createEmbed(`Now Playing: ${video.title}`)).then(() => {
 				const dispatcher = connection.playStream(request(video.url));
 
 				dispatcher.on('debug', i => console.log(`debug: ${i}`));
@@ -100,8 +100,20 @@ module.exports = function (Kirbi) {
 		return voiceChannelArray[0];
 	}
 
-	function wrap(text) {
-		return '```\n' + text.replace(/`/g, '`' + String.fromCharCode(8203)) + '\n```';
+	function createEmbed(text) {
+		return {
+			embed: {
+				color: Kirbi.Config.discord.defaultEmbedColor,
+				author: {
+					name: 'Music Player',
+					icon_url: 'https://emojipedia-us.s3.amazonaws.com/thumbs/120/twitter/103/multiple-musical-notes_1f3b6.png'
+				},
+				footer: {
+					text: 'powered by youtube-dl'
+				},
+				description: text
+			}
+		};
 	}
 
 	return {
@@ -117,7 +129,7 @@ module.exports = function (Kirbi) {
 		],
 		play: {
 			usage: '<search terms|URL>',
-			description: 'Plays the given video in the user\'s voice channel. Supports YouTube and many others: <http://rg3.github.io/youtube-dl/supportedsites.html>',
+			description: `Plays the given video in the user's voice channel. Supports YouTube and many others: <http://rg3.github.io/youtube-dl/supportedsites.html>`,
 			process: (msg, suffix, isEdit) => {
 				if (isEdit) {
 					return;
@@ -126,12 +138,12 @@ module.exports = function (Kirbi) {
 				const arr = msg.guild.channels.filter(v => v.type === 'voice').filter(v => v.members.has(msg.author.id));
 				// Make sure the user is in a voice channel.
 				if (arr.length === 0) {
-					return msg.channel.send(wrap('You\'re not in a voice channel.'));
+					return msg.channel.send(createEmbed(`You're not in a voice channel.`));
 				}
 
 				// Make sure the suffix exists.
 				if (!suffix) {
-					return msg.channel.send(wrap('No video specified!'));
+					return msg.channel.send(createEmbed('No video specified!'));
 				}
 
 				// Get the queue.
@@ -139,25 +151,25 @@ module.exports = function (Kirbi) {
 
 				// Check if the queue has reached its maximum size.
 				if (queue.length >= MAX_QUEUE_SIZE) {
-					return msg.channel.send(wrap('Maximum queue size reached!'));
+					return msg.channel.send(createEmbed('Maximum queue size reached!'));
 				}
 
 				// Get the video information.
-				msg.channel.send(wrap('Searching...')).then(response => {
+				msg.channel.send(createEmbed('Searching...')).then(response => {
 					// If the suffix doesn't start with 'http', assume it's a search.
 					if (!suffix.toLowerCase().startsWith('http')) {
-						suffix = 'gvsearch1:' + suffix;
+						suffix = `gvsearch1:${suffix}`;
 					}
 
 					// Get the video info from youtube-dl.
 					YoutubeDL.getInfo(suffix, ['-q', '--no-warnings', '--force-ipv4'], (err, info) => {
 						// Verify the info.
 						if (err || info.format_id === undefined || info.format_id.startsWith('0')) {
-							return response.edit(wrap('Invalid video!'));
+							return response.edit(createEmbed('Invalid video!'));
 						}
 
 						// Queue the video.
-						response.edit(wrap('Queued: ' + info.title)).then(resp => {
+						response.edit(createEmbed(`Queued: ${info.title}`)).then(resp => {
 							queue.push(info);
 
 							// Play if only one element in the queue.
@@ -176,7 +188,7 @@ module.exports = function (Kirbi) {
 				// Get the voice connection.
 				const voiceConnection = Kirbi.Discord.voiceConnections.get(msg.guild.id);
 				if (voiceConnection === null) {
-					return msg.channel.send(wrap('No music being played.'));
+					return msg.channel.send(createEmbed('No music being played.'));
 				}
 
 				// Get the queue.
@@ -199,7 +211,7 @@ module.exports = function (Kirbi) {
 
 				voiceConnection.player.dispatcher.end();
 
-				msg.channel.send(wrap(`Skipped ${toSkip}!`));
+				msg.channel.send(createEmbed(`Skipped ${toSkip}!`));
 			}
 		},
 		queue: {
@@ -209,7 +221,7 @@ module.exports = function (Kirbi) {
 				const queue = getQueue(msg.guild.id);
 
 				// Get the queue text.
-				const text = queue.map((video, index) => ((index + 1) + `: ${video.title}`)).join('\n');
+				const text = queue.map((video, index) => (`${(index + 1)}: ${video.title}`)).join('\n');
 
 				// Get the status of the queue.
 				let queueStatus = 'Stopped';
@@ -219,21 +231,21 @@ module.exports = function (Kirbi) {
 				}
 
 				// Send the queue and status.
-				msg.channel.send(wrap(`Queue (${queueStatus}):\n${text}`));
+				msg.channel.send(createEmbed(`Queue (${queueStatus}):\n${text}`));
 			}
 		},
 		dequeue: {
-			description: 'Dequeues the given song index from the song queue.  Use the queue command to get the list of songs in the queue.',
+			description: 'Dequeues the given song index from the song queue. Use the queue command to get the list of songs in the queue.',
 			process: (msg, suffix) => {
 				// Define a usage string to print out on errors
-				const usageString = 'The format is "!dequeue <index>".  Use !queue to find the indices of each song in the queue.';
+				const usageString = `The format is "${Kirbi.Config.commandPrefix}dequeue <index>". Use ${Kirbi.Config.commandPrefix}queue to find the indices of each song in the queue.`;
 
 				// Get the queue.
 				const queue = getQueue(msg.guild.id);
 
 				// Make sure the suffix exists.
 				if (!suffix) {
-					return msg.channel.send(wrap('You need to specify an index to remove from the queue.  ' + usageString));
+					return msg.channel.send(createEmbed(`You need to specify an index to remove from the queue. ${usageString}`));
 				}
 
 				// Get the arguments
@@ -241,7 +253,7 @@ module.exports = function (Kirbi) {
 
 				// Make sure there's only 1 index
 				if (split.length > 1) {
-					return msg.channel.send(wrap('There are too many arguments.  ' + usageString));
+					return msg.channel.send(createEmbed(`There are too many arguments. ${usageString}`));
 				}
 
 				// Remove the index
@@ -266,14 +278,14 @@ module.exports = function (Kirbi) {
 							queue.splice(index, 1);
 						}
 					} else {
-						return msg.channel.send(wrap('The index is out of range.  ' + usageString));
+						return msg.channel.send(createEmbed(`The index is out of range. ${usageString}`));
 					}
 				} else {
-					return msg.channel.send(wrap('That index isn\'t a number.  ' + usageString));
+					return msg.channel.send(createEmbed(`That index isn't a number. ${usageString}`));
 				}
 
 				// Send the queue and status.
-				msg.channel.send(wrap('Removed \'' + songRemoved + '\' (index ' + split[0] + ') from the queue.'));
+				msg.channel.send(createEmbed(`Removed '${songRemoved}' (index ${split[0]}) from the queue.`));
 			}
 		},
 		pause: {
@@ -282,11 +294,11 @@ module.exports = function (Kirbi) {
 				// Get the voice connection.
 				const voiceConnection = Kirbi.Discord.voiceConnections.get(msg.guild.id);
 				if (voiceConnection === null) {
-					return msg.channel.send(wrap('No music being played.'));
+					return msg.channel.send(createEmbed('No music being played.'));
 				}
 
 				// Pause.
-				msg.channel.send(wrap('Playback paused.'));
+				msg.channel.send(createEmbed('Playback paused.'));
 
 				if (voiceConnection.player.dispatcher) {
 					voiceConnection.player.dispatcher.pause();
@@ -299,11 +311,11 @@ module.exports = function (Kirbi) {
 				// Get the voice connection.
 				const voiceConnection = Kirbi.Discord.voiceConnections.get(msg.guild.id);
 				if (voiceConnection === null) {
-					return msg.channel.send(wrap('No music being played.'));
+					return msg.channel.send(createEmbed('No music being played.'));
 				}
 
 				// Resume.
-				msg.channel.send(wrap('Playback resumed.'));
+				msg.channel.send(createEmbed('Playback resumed.'));
 				if (voiceConnection.player.dispatcher) {
 					voiceConnection.player.dispatcher.resume();
 				}
@@ -331,14 +343,14 @@ module.exports = function (Kirbi) {
 				const voiceConnection = Kirbi.Discord.voiceConnections.get(msg.guild.id);
 
 				if (voiceConnection === null) {
-					return msg.channel.send(wrap('No music being played.'));
+					return msg.channel.send(createEmbed('No music being played.'));
 				}
 
 				// Set the volume
 				if (voiceConnection.player.dispatcher) {
 					if (suffix === '') {
 						const displayVolume = Math.pow(voiceConnection.player.dispatcher.volume, 0.6020600085251697) * 100.0;
-						msg.channel.send(wrap(`volume: ${displayVolume}%`));
+						msg.channel.send(createEmbed(`volume: ${displayVolume}%`));
 					} else if (suffix.toLowerCase().indexOf('db') === -1) {
 						if (suffix.indexOf('%') === -1) {
 							if (suffix > 1) {
