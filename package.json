@@ -31,7 +31,7 @@
 			"guard-for-in": "warn", 
 			"import/no-unresolved": "off",
 			"camelcase": "off",
-			"no-negated-condition": "warn",
+			"no-negated-condition": "off",
 			"object-curly-spacing": [
 				"error",
 				"always",
@@ -39,8 +39,8 @@
 					"arraysInObjects": false
 				}
 			],
-			"eqeqeq": "warn",
-			"no-eq-null": "warn"
+			"eqeqeq": "off",
+			"no-eq-null": "off"
 		}
 	},
 	"scripts": {
