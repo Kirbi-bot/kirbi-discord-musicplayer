@@ -1,7 +1,7 @@
 const YoutubeDL = require('youtube-dl');
 const request = require('request');
 
-module.exports = function (Kirbi) {
+module.exports = Kirbi => {
 	const options = false;
 	const GLOBAL_QUEUE = (options && options.global) || false;
 	const MAX_QUEUE_SIZE = (options && options.maxQueueSize) || 20;
