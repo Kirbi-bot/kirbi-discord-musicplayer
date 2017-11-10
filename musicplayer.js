@@ -187,12 +187,17 @@ module.exports = Kirbi => {
 			process: (msg, suffix) => {
 				// Get the voice connection.
 				const voiceConnection = Kirbi.Discord.voiceConnections.get(msg.guild.id);
-				if (voiceConnection === null) {
+				if (voiceConnection === null || voiceConnection === undefined) {
 					return msg.channel.send(createEmbed('No music being played.'));
 				}
 
 				// Get the queue.
 				const queue = getQueue(msg.guild.id);
+
+				if (queue.length < 1) {
+					msg.channel.send(createEmbed('No music is in the queue.'));
+					return;
+				}
 
 				// Get the number to skip.
 				let toSkip = 1; // Default 1.
