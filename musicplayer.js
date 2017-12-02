@@ -63,8 +63,6 @@ module.exports = Kirbi => {
 			const video = queue[0];
 
 			// Play the video.
-			console.log(video);
-
 			msg.channel.send(createSongEmbed(video.title, video.webpage_url, video.thumbnail)).then(() => {
 				let dispatcher;
 				if (video.is_live === true) {
