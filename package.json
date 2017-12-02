@@ -16,7 +16,7 @@
 	"main": "musicplayer.js",
 	"dependencies": {
 		"ffmpeg-binaries": "^3.2.2",
-		"kirbi-discord": "Richardson-Media-House/kirbi-discord",
+		"m3u8stream": "^0.2.1",
 		"request": "2.81.0",
 		"youtube-dl": "^1.11.1"
 	},
@@ -28,7 +28,7 @@
 			"linebreak-style": "off",
 			"no-prototype-builtins": "warn",
 			"radix": "warn",
-			"guard-for-in": "warn", 
+			"guard-for-in": "warn",
 			"import/no-unresolved": "off",
 			"camelcase": "off",
 			"no-negated-condition": "off",
