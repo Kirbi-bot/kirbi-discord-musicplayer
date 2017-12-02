@@ -1,5 +1,5 @@
-const YoutubeDL = require('youtube-dl');
-const request = require('request');
+const m3u8stream = require('m3u8stream');
+const ytdl = require('youtube-dl');
 
 module.exports = Kirbi => {
 	const options = false;
@@ -64,7 +64,12 @@ module.exports = Kirbi => {
 
 			// Play the video.
 			msg.channel.send(createEmbed(`Now Playing: ${video.title}`)).then(() => {
-				const dispatcher = connection.playStream(request(video.url));
+				let dispatcher;
+				if (video.is_live) {
+					dispatcher = connection.playStream(m3u8stream(video.url));
+				} else {
+					dispatcher = connection.playStream(ytdl(video.url, ['-q', '--no-warnings', '--force-ipv4'], { filter: 'audioonly' }));
+				}
 
 				dispatcher.on('debug', i => console.log(`debug: ${i}`));
 				// Catch errors in the connection.
@@ -162,7 +167,7 @@ module.exports = Kirbi => {
 					}
 
 					// Get the video info from youtube-dl.
-					YoutubeDL.getInfo(suffix, ['-q', '--no-warnings', '--force-ipv4'], (err, info) => {
+					ytdl.getInfo(suffix, ['-q', '--no-warnings', '--force-ipv4'], (err, info) => {
 						// Verify the info.
 						if (err || info.format_id === undefined || info.format_id.startsWith('0')) {
 							return response.edit(createEmbed('Invalid video!'));
@@ -187,12 +192,17 @@ module.exports = Kirbi => {
 			process: (msg, suffix) => {
 				// Get the voice connection.
 				const voiceConnection = Kirbi.Discord.voiceConnections.get(msg.guild.id);
-				if (voiceConnection === null) {
+				if (voiceConnection === null || voiceConnection === undefined) {
 					return msg.channel.send(createEmbed('No music being played.'));
 				}
 
 				// Get the queue.
 				const queue = getQueue(msg.guild.id);
+
+				if (queue.length < 1) {
+					msg.channel.send(createEmbed('No music is in the queue.'));
+					return;
+				}
 
 				// Get the number to skip.
 				let toSkip = 1; // Default 1.
